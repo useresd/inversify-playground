@@ -3,6 +3,12 @@ import { ICustomerRepository } from "../repositories/customer.repository.interfa
 import { Customer } from "../entities/customer.entity";
 import { TYPES } from "./../ioc/types";
 import "reflect-metadata";
+import { CustomerCreateDto } from "../dto/CustomerCreateDto";
+import { validateOrReject } from "class-validator";
+import { plainToClass } from "class-transformer";
+import { faker } from "@faker-js/faker";
+import { TYPES as TOKENS } from "./../../csp-base-pkg/ioc/types";
+import { Logger } from "pino";
 
 /**
  * Service class for managing customer operations.
@@ -15,7 +21,8 @@ export class CustomerService {
      * @param customerRepository - The repository to manage customer data.
      */
     constructor(
-        @inject(TYPES.CustomerRepository) private customerRepository: ICustomerRepository
+        @inject(TYPES.CustomerRepository) private customerRepository: ICustomerRepository,
+        @inject(TOKENS.Logger) private logger: Logger
     ) {}
 
     /**
@@ -24,8 +31,32 @@ export class CustomerService {
      * @param id - The ID of the customer to retrieve.
      * @returns The Customer object with the specified ID.
      */
-    getOne(id: string): Customer {
+    getOne(id: string): Promise<Customer> {
         return this.customerRepository.findById(id);
     }
+
+    /**
+     * Creates a new Customer entity from a CustomerCreateDto.
+     * 
+     * @param customerCreateDto - The DTO with customer information.
+     * @returns The newly created Customer entity.
+     */
+    async create(customerCreateDto: CustomerCreateDto) {
+
+        this.logger.info("creating a new customer. logged from service class");
+
+        // validate the customer create dto
+        await validateOrReject(customerCreateDto);
+
+        // Convert the customerDto to a customer class
+        let customer = plainToClass(Customer, customerCreateDto);
+        
+        // Example business logic, set id to the customer.
+        customer.setId(faker.string.uuid());
+
+        // Use customer repository to create a customer
+        return this.customerRepository.create(customer);
+    }
+
 
 }

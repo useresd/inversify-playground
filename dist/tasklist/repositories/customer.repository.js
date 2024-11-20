@@ -11,10 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerRepository = void 0;
 const inversify_1 = require("inversify");
 const types_1 = require("./../../csp-base-pkg/ioc/types");
+const types_2 = require("./../../csp-base-pkg/ioc/types");
 const customer_entity_1 = require("./../entities/customer.entity");
 const faker_1 = require("@faker-js/faker");
 /**
@@ -27,9 +37,10 @@ let CustomerRepository = class CustomerRepository {
      * @param logger - The Logger service used for logging.
      * @param userInfo - The UserInfo object containing details about the current user.
      */
-    constructor(logger, userInfo) {
+    constructor(logger, userInfo, tenantDetailsProvider) {
         this.logger = logger;
         this.userInfo = userInfo;
+        this.tenantDetailsProvider = tenantDetailsProvider;
     }
     /**
      * Finds a customer by their ID.
@@ -40,12 +51,24 @@ let CustomerRepository = class CustomerRepository {
      * @returns The Customer object with the specified ID.
      */
     findById(id) {
-        this.logger.warn("using logger inside repository");
-        this.logger.warn(`current user is: ${this.userInfo.email}`);
-        let customer = new customer_entity_1.Customer()
-            .setId(id)
-            .setName(faker_1.faker.person.fullName())
-            .setAddress(faker_1.faker.location.streetAddress());
+        return __awaiter(this, void 0, void 0, function* () {
+            let tenant = yield this.tenantDetailsProvider();
+            this.logger.warn(`finding a customer by id with user ${this.userInfo.email} in tenant id: ${tenant.id}, name: ${tenant.name}`);
+            let customer = new customer_entity_1.Customer()
+                .setId(id)
+                .setName(faker_1.faker.person.fullName())
+                .setAddress(faker_1.faker.location.streetAddress());
+            return customer;
+        });
+    }
+    /**
+     * Creates a new Customer entity from a CustomerCreateDto.
+     *
+     * @param customerDto - The DTO with customer information.
+     * @returns The newly created Customer entity.
+     */
+    create(customer) {
+        this.logger.info(`creating customer in the repository with user ${this.userInfo.email}`);
         return customer;
     }
 };
@@ -54,5 +77,6 @@ exports.CustomerRepository = CustomerRepository = __decorate([
     (0, inversify_1.injectable)(),
     __param(0, (0, inversify_1.inject)(types_1.TYPES.Logger)),
     __param(1, (0, inversify_1.inject)(types_1.TYPES.UserInfo)),
-    __metadata("design:paramtypes", [Object, Object])
+    __param(2, (0, inversify_1.inject)(types_2.TYPES.TenantDetailsProvider)),
+    __metadata("design:paramtypes", [Object, Object, Function])
 ], CustomerRepository);

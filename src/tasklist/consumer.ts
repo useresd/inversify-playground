@@ -4,8 +4,20 @@ import { UserInfo } from "../csp-base-pkg/types/UserInfo";
 import { container } from "./../csp-base-pkg/ioc/container";
 import { CustomerService } from "./services/customer.service";
 import { bind } from "./ioc/container";
+import { faker } from "@faker-js/faker/.";
 
+/**
+ * Bind the dependencies from the container
+ */
 bind(container);
+
+/**
+ * The message type consumed from ActiveMQ
+ */
+type Message = {
+    body: string,
+    userInfo: UserInfo
+};
 
 /**
  * Connects to a queue and processes a message.
@@ -13,14 +25,8 @@ bind(container);
  * @param message - The message object containing the body and userInfo.
  * @param message.body - The body of the message.
  * @param message.userInfo - The user information related to the message.
- * 
- * @example
- * connectToQueue({
- *   body: "Hello, World", 
- *   userInfo: {id: "1", fullName: "John Doe", email: "john@doe.com"}
- * });
  */
-function connectToQueue(message: { body: string, userInfo: UserInfo }) {
+function connectToQueue(message: Message) {
 
     // Create a child container to manage request-specific bindings
     const myContainer = container.createChild();
@@ -36,5 +42,5 @@ function connectToQueue(message: { body: string, userInfo: UserInfo }) {
 // Example usage of the connectToQueue function
 connectToQueue({
     body: "Hello, World", 
-    userInfo: { id: "1", fullName: "John Doe", email: "john@doe.com" }
+    userInfo: { id: "1", fullName: "John Doe", email: "john@doe.com", organizationId: faker.string.uuid() }
 });

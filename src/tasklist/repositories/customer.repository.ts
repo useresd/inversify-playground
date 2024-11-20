@@ -2,10 +2,11 @@ import { injectable, inject } from "inversify";
 import { Logger } from "pino";
 import { UserInfo } from "./../../csp-base-pkg/types/UserInfo";
 import { TYPES } from "./../../csp-base-pkg/ioc/types";
+import { TYPES as TOKENS } from "./../../csp-base-pkg/ioc/types";
 import { ICustomerRepository } from "./customer.repository.interface";
 import { Customer } from "./../entities/customer.entity";
 import { faker } from "@faker-js/faker";
-
+import { TenantDetailsProvider } from "../../csp-base-pkg/ioc/container";
 /**
  * Repository class for managing customer data.
  * Implements the ICustomerRepository interface.
@@ -20,7 +21,8 @@ export class CustomerRepository implements ICustomerRepository {
      */
     constructor(
         @inject(TYPES.Logger) private logger: Logger,
-        @inject(TYPES.UserInfo) private userInfo: UserInfo
+        @inject(TYPES.UserInfo) private userInfo: UserInfo,
+        @inject(TOKENS.TenantDetailsProvider) private tenantDetailsProvider: TenantDetailsProvider
     ) {}
 
     /**
@@ -31,10 +33,12 @@ export class CustomerRepository implements ICustomerRepository {
      * @param id - The ID of the customer to find.
      * @returns The Customer object with the specified ID.
      */
-    findById(id: string): Customer {
+    async findById(id: string): Promise<Customer> {
 
-        this.logger.warn("using logger inside repository");
-        this.logger.warn(`current user is: ${this.userInfo.email}`);
+        let tenant = await this.tenantDetailsProvider();
+        
+        this.logger.warn(`finding a customer by id with user ${this.userInfo.email} in tenant id: ${tenant.id}, name: ${tenant.name}`);
+
 
         let customer = new Customer()
             .setId(id)
@@ -43,4 +47,17 @@ export class CustomerRepository implements ICustomerRepository {
 
         return customer;
     }
+
+    /**
+     * Creates a new Customer entity from a CustomerCreateDto.
+     * 
+     * @param customerDto - The DTO with customer information.
+     * @returns The newly created Customer entity.
+     */
+    create(customer: Customer): Customer {
+        this.logger.info(`creating customer in the repository with user ${this.userInfo.email}`);
+        return customer;
+    }
+    
+
 }

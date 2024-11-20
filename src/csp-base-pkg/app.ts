@@ -9,6 +9,7 @@ const app = express();
 
 export function start(routers: express.Router[]) {
     
+    app.use(express.json());
     app.use(authenticateMiddleware);
     app.use(pinoHttpMiddleware());
     

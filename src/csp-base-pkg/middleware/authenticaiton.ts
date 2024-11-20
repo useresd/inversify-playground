@@ -5,7 +5,8 @@ export function authenticateMiddleware (req: express.Request, res: express.Respo
     req.user = {
         id: faker.string.uuid(),
         email: faker.internet.email(),
-        fullName: faker.person.fullName()
+        fullName: faker.person.fullName(),
+        organizationId: faker.string.uuid()
     }
     next();
 }
