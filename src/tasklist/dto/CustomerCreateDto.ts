@@ -9,7 +9,6 @@ export class CustomerCreateDto {
    * The name of the customer.
    */
   @IsString()
-  @IsAlpha()
   @MaxLength(30)
   @IsNotEmpty()
   name!: string;

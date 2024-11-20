@@ -22,7 +22,6 @@ export class CustomerRepository implements ICustomerRepository {
     constructor(
         @inject(TYPES.Logger) private logger: Logger,
         @inject(TYPES.UserInfo) private userInfo: UserInfo,
-        @inject(TOKENS.TenantDetailsProvider) private tenantDetailsProvider: TenantDetailsProvider
     ) {}
 
     /**
@@ -35,9 +34,7 @@ export class CustomerRepository implements ICustomerRepository {
      */
     async findById(id: string): Promise<Customer> {
 
-        let tenant = await this.tenantDetailsProvider();
-        
-        this.logger.warn(`finding a customer by id with user ${this.userInfo.email} in tenant id: ${tenant.id}, name: ${tenant.name}`);
+        this.logger.warn(`finding a customer by id with user ${this.userInfo.email}`);
 
 
         let customer = new Customer()

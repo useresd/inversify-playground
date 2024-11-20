@@ -20,6 +20,8 @@ export function start(routers: express.Router[]) {
     }
 
     const server = http.createServer(app);
+
+    const PORT = 3000;
     
-    server.listen(3000, () => console.log("working!!!!"));
+    server.listen(PORT, () => console.log(`server started listening on port ${PORT}`));
 }
