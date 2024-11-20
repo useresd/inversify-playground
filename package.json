@@ -1,0 +1,29 @@
+{
+  "name": "inversify-playground",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@faker-js/faker": "^9.2.0",
+    "express": "^4.21.1",
+    "inversify": "^6.1.4",
+    "mongoose": "^8.8.2",
+    "pino": "^9.5.0",
+    "pino-http": "^10.3.0",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/inversify": "^2.0.33",
+    "@types/node": "^22.9.1",
+    "@types/pino": "^7.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
