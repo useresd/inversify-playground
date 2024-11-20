@@ -1,4 +1,4 @@
-import { injectable, inject } from "inversify";
+import { injectable, inject, named } from "inversify";
 import { ICustomerRepository } from "../repositories/customer.repository.interface";
 import { Customer } from "../entities/customer.entity";
 import { TYPES } from "./../ioc/types";
@@ -9,6 +9,7 @@ import { plainToClass } from "class-transformer";
 import { faker } from "@faker-js/faker";
 import { TYPES as TOKENS } from "./../../csp-base-pkg/ioc/types";
 import { Logger } from "pino";
+import { License } from "../../csp-base-pkg/license/license.interface";
 
 /**
  * Service class for managing customer operations.
@@ -22,7 +23,6 @@ export class CustomerService {
      */
     constructor(
         @inject(TYPES.CustomerRepository) private customerRepository: ICustomerRepository,
-        @inject(TOKENS.Logger) private logger: Logger
     ) {}
 
     /**
@@ -42,8 +42,6 @@ export class CustomerService {
      * @returns The newly created Customer entity.
      */
     async create(customerCreateDto: CustomerCreateDto) {
-
-        this.logger.info("creating a new customer. logged from service class");
 
         // validate the customer create dto
         await validateOrReject(customerCreateDto);

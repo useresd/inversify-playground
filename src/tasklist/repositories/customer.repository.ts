@@ -1,4 +1,4 @@
-import { injectable, inject } from "inversify";
+import { injectable, inject, named } from "inversify";
 import { Logger } from "pino";
 import { UserInfo } from "./../../csp-base-pkg/types/UserInfo";
 import { TYPES } from "./../../csp-base-pkg/ioc/types";
@@ -7,6 +7,8 @@ import { ICustomerRepository } from "./customer.repository.interface";
 import { Customer } from "./../entities/customer.entity";
 import { faker } from "@faker-js/faker";
 import { TenantDetailsProvider } from "../../csp-base-pkg/ioc/container";
+import { License } from "../../csp-base-pkg/license/license.interface";
+
 /**
  * Repository class for managing customer data.
  * Implements the ICustomerRepository interface.
@@ -22,6 +24,7 @@ export class CustomerRepository implements ICustomerRepository {
     constructor(
         @inject(TYPES.Logger) private logger: Logger,
         @inject(TYPES.UserInfo) private userInfo: UserInfo,
+        @inject(TYPES.License) @named("advanced") private license: License
     ) {}
 
     /**
@@ -35,7 +38,6 @@ export class CustomerRepository implements ICustomerRepository {
     async findById(id: string): Promise<Customer> {
 
         this.logger.warn(`finding a customer by id with user ${this.userInfo.email}`);
-
 
         let customer = new Customer()
             .setId(id)

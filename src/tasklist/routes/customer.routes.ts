@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { CustomerService } from "../services/customer.service";
 import { TYPES } from "./../ioc/types";
+import { TYPES as TOKENS } from "./../../csp-base-pkg/ioc/types";
 import { plainToClass } from "class-transformer";
 import "reflect-metadata";
 import { CustomerCreateDto } from "../dto/CustomerCreateDto";
+import { License } from "../../csp-base-pkg/license/license.interface";
 
 export const router = Router();
 
@@ -14,6 +16,7 @@ router.get("/customers/:id", async (req, res) => {
     
     // Retrieve the CustomerService instance from the Inversify container
     let customerService = req.container.get<CustomerService>(TYPES.CustomerService);
+    let licens = req.container.getNamed<License>(TOKENS.License, "advanced");
 
     // Get the customer data using the customerService
     let result = await customerService.getOne(req.params.id);
